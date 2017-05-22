@@ -1,45 +1,70 @@
+/* Exercise 1 */
+//console.log('HELLO WORLD');
+
 /* Exercise 2 */
-/*var result = 0;
+/*var total = 0;
 for (var i = 2; i < process.argv.length; i++) {
-	result += Number(process.argv[i]);
-};
-console.log(result);*/
+	total += Number(process.argv[i]);
+}
+console.log(total);*/
 
 /* Exercise 3 */
 /*var fs = require('fs');
-var buffer = fs.readFileSync(process.argv[2]);
-var jumlahLine = buffer.toString().split('\n').length - 1;
+var bufferStr = fs.readFileSync(process.argv[2], 'utf8');
+var jumlahLine = bufferStr.split('\n').length - 1;
 console.log(jumlahLine);*/
 
 /* Exercise 4 */
 /*var fs = require('fs');
-fs.readFile(process.argv[2], function(err, data){
-	if(err){
-		console.log('error gan:', err);
+var file = undefined;
+var jumlahLine = 0;
+
+file = fs.readFile(process.argv[2], 'utf8', function(err, data){
+	if (err) {
+		console.log(err);
 	}else{
-		var jumlahLine = data.toString().split('\n').length - 1;
+		jumlahLine = data.split('\n').length - 1;
+		console.log(jumlahLine);
 	}
-	console.log(jumlahLine);
 });*/
 
 /* Exercise 5 */
 /*var fs = require('fs');
 var path = require('path');
+var p = process.argv[2];
 
-fs.readdir(process.argv[2], function(err, list){
-	for (var i = 0; i < list.length; i++) {
-		if ('.'+ (process.argv[3]) == path.extname(list[i])) {
-			console.log(list[i]);
-		}else{
-			continue;
-		}
+//cek direktori
+fs.stat(p, function(err, status){
+	if (err) {
+		//kalau tidak ditemukan atau sejenisnya
+		console.log(err);
+	}
+
+	if (!status.isDirectory()) {
+		callback(new Error('Pastikan anda mengetik path/alamat direktori dengan benar'));
+	}else{
+		//Jalankan perintah readdir
+		fs.readdir(p, function(err, data){
+			if (err) {
+				console.log(err);
+			}else{
+				for (var i = 0; i < data.length; i++) {
+					//Kalau data yg dicari sesuai, keluarkan
+					if ('.' + process.argv[3] == path.extname(data[i])) {
+						console.log(data[i]);
+					}else{
+						//jika tidak, lanjut
+						continue;
+					}
+				}
+			}
+		});
 	}
 });*/
 
 /* Exercise 6 */
-/*var mymodule = require("./mymodule.js");
-
-mymodule(process.argv[2], process.argv[3], function(err, data){
+/*var module = require('./mymodule.js');
+module(process.argv[2], process.argv[3], function(err, data){
 	data.forEach(function(item){
 		console.log(item);
 	});
@@ -48,111 +73,118 @@ mymodule(process.argv[2], process.argv[3], function(err, data){
 /* Exercise 7 */
 /*var http = require('http');
 
-http.get(process.argv[2], function(res){
-	res.setEncoding('utf8');
-	res.on('data', function(chunk){
-		console.log(chunk);
+http.get(process.argv[2], function(respon){
+	respon.setEncoding('utf8'); //jadikan string utf8
+
+	respon.on('data', function(potonganData){
+		console.log(potonganData);
 	});
 
-	res.on('error', function(err){
-		console.log(err);
-	});
+	respon.on('error', function(err){
+		console.log('Error: ' + err.message);
+	})
 });*/
 
 /* Exercise 8 */
 /*var http = require('http');
+var datanya = '';
 
-http.get(process.argv[2], function(res){
-	var datanya = '';
-	res.setEncoding('utf8');
-	res.on('data', function(chunk){
-		//console.log(chunk);
-		datanya += chunk;
+http.get(process.argv[2], function(respon){
+	respon.setEncoding('utf8'); //jadikan string utf8
+
+	respon.on('data', function(potonganData){
+		//console.log(potonganData);
+		datanya += potonganData;
 	});
 
-	res.on('end', function(){
+	respon.on('end', function(){
 		console.log(datanya.length);
 		console.log(datanya);
 	});
 
-	res.on('error', function(err){
-		console.log(err);
-	});
+	respon.on('error', function(err){
+		console.log('Error: ' + err.message);
+	})
 });*/
 
 /* Exercise 9 */
+//global variable
 /*var http = require('http');
+var datanya = '';
 
-http.get(process.argv[2], function(res){
-	var datanya = '';
-	res.setEncoding('utf8');
-	res.on('data', function(chunk){
-		//console.log(chunk);
-		datanya += chunk;
+http.get(process.argv[2], function(respon){
+	respon.setEncoding('utf8'); //jadikan string utf8
+
+	respon.on('data', function(potonganData){
+		datanya += potonganData;
 	});
 
-	res.on('end', function(){
-		console.log(datanya);
+	respon.on('end', function(){
+		console.log(datanya); //keluarkan
 
-		http.get(process.argv[3], function(res){
-			var datake2 = '';
-			res.setEncoding('utf8');
-			res.on('data', function(chunk){
-				//console.log(chunk);
-				datake2 += chunk;
+		datanya = ''//lalu kosongkan datanya
+
+		http.get(process.argv[3], function(respon){
+			respon.setEncoding('utf8'); //jadikan string utf8
+
+			respon.on('data', function(potonganData){
+				datanya += potonganData;
 			});
 
-			res.on('end', function(){
-				console.log(datake2);
+			respon.on('end', function(){
+				console.log(datanya);
 
-				http.get(process.argv[4], function(res){
-					var datake3 = '';
-					res.setEncoding('utf8');
-					res.on('data', function(chunk){
-						//console.log(chunk);
-						datake3 += chunk;
+				datanya = '';
+
+				http.get(process.argv[4], function(respon){
+					respon.setEncoding('utf8'); //jadikan string utf8
+
+					respon.on('data', function(potonganData){
+						datanya += potonganData;
 					});
 
-					res.on('end', function(){
-						console.log(datake3);
+					respon.on('end', function(){
+						console.log(datanya);
 					});
 
-					res.on('error', function(err){
-						console.log(err);
-					});
+					respon.on('error', function(err){
+						console.log('Error: ' + err);
+					})
 				});
 			});
-
-			res.on('error', function(err){
-				console.log(err);
-			});
+			respon.on('error', function(err){
+				console.log('Error: ' + err);
+			})
 		});
 	});
-
-	res.on('error', function(err){
-		console.log(err);
-	});
+	respon.on('error', function(err){
+		console.log('Error: ' + err);
+	})
 });*/
 
 /* Exercise 10 */
 /*var net = require('net');
-net.createServer(function(socket){
+net.createServer(function (sangserver){
 	var date = new Date();
 
 	var bulan = date.getMonth() + 1;
-	if(bulan < 10){
-		bulan = '0' + bulan;
-	}
 
-	socket.write(date.getFullYear() + '-' + bulan + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + '\n');
-	socket.end()
-}).listen(process.argv[2]);*/
+	//setting penulisan bulan
+	if (bulan < 10) {
+		bulan = '0' + bulan;
+	};
+
+	//minta sangserver outputkan waktu
+	//format: YYYY-MM-DD hh:mm
+	sangserver.write(date.getFullYear() + '-' + bulan + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + '\n');
+	sangserver.end()
+}).listen(process.argv[2]);*/ //host yg diketik
 
 /* Exercise 11 */
 /*var http = require('http');
 var fs = require('fs');
 
-http.createServer(function(req, res){
+http.createServer(function (req, res){
 	var stream = fs.createReadStream(process.argv[3]);
 
 	stream.on('open', function(){
@@ -168,18 +200,20 @@ http.createServer(function(req, res){
 /*var http = require('http');
 var map = require('through2-map');
 
-http.createServer(function (req, res){
+http.createServer(function(req, res){
 	if (req.method == 'POST') {
-		var _map = map(function(chunk){
-			return chunk.toString().toUpperCase();
+		var potonganDataKapital = map(function (potonganData){
+			return potonganData.toString().toUpperCase(); 
 		});
-		req.pipe(_map).pipe(res);
+
+		req.pipe(potonganDataKapital).pipe(res);
 	}
 }).listen(process.argv[2]);*/
 
 /* Exercise 13 */
-var http = require('http');
+/*var http = require('http');
 var url = require('url');
+var port = process.argv[2];
 
 http.createServer(function(req, res){
 	var parseUrl = url.parse(req.url, true);
@@ -195,7 +229,8 @@ http.createServer(function(req, res){
 				"minute":date.getMinutes(),
 				"second":date.getSeconds(),
 			}));
-			break;
+		break;
+
 		case '/api/unixtime':
 			var date = new Date(parseUrl.query.iso);
 			res.writeHead(200, {
@@ -204,6 +239,9 @@ http.createServer(function(req, res){
 			res.end(JSON.stringify({
 				"unixtime":date.getTime()
 			}));
-			break;
-	}	
-}).listen(process.argv[2]);
+		break;
+	}
+}).listen(port);*/
+
+
+
